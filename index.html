@@ -215,7 +215,7 @@
       <button data-tab="diagnostico">Diagnóstico</button>
       <button data-tab="contato">Contato</button>
     </nav>
-    <button type="button" class="cta-header" onclick="openWhats('Olá! Gostaria de solicitar um diagnóstico para minha clínica.')">Solicitar diagnóstico →</button>
+    <button class="cta-header" data-tab="diagnostico">Solicitar diagnóstico →</button>
     <button class="burger" id="burgerBtn">☰</button>
   </header>
 
@@ -440,30 +440,27 @@
           </div>
 
           <div class="form-card">
-            <form id="diagForm" action="https://formsubmit.co/eloga.contato@gmail.com" method="POST">
-              <input type="hidden" name="_next" value="https://helle-machado.github.io/formulario-eloga/">
-              <input type="hidden" name="_subject" value="Novo contato para diagnóstico — site ELOGA">
-              <input type="hidden" name="_template" value="table">
-              <input type="hidden" name="_captcha" value="false">
-              <input type="hidden" name="Etapa" value="Contato registrado antes da ficha; conclusão do diagnóstico não verificada.">
-              <input type="hidden" name="Data_UTC" id="dataEnvio">
-              <input type="hidden" name="_url" id="origemEnvio">
-              <div style="display:none" aria-hidden="true"><input type="text" name="_honey" tabindex="-1" autocomplete="off"></div>
+            <form id="diagForm" novalidate>
               <div class="field">
                 <label for="fNome">Nome de quem está preenchendo *</label>
-                <input type="text" id="fNome" name="nome" required maxlength="150" autocomplete="name">
+                <input type="text" id="fNome" required autocomplete="name">
               </div>
               <div class="field">
-                <label for="fInsta">Instagram *</label>
-                <input type="text" id="fInsta" name="instagram" required maxlength="100" placeholder="@seuperfil" autocapitalize="none" spellcheck="false">
+                <label for="fEmpresa">Nome da empresa/clínica *</label>
+                <input type="text" id="fEmpresa" required autocomplete="organization">
               </div>
               <div class="field">
-                <label for="fEmail">E-mail para contato *</label>
-                <input type="email" id="fEmail" name="email" required maxlength="254" autocomplete="email" placeholder="seuemail@empresa.com">
-                <div class="field-hint">Todos os campos são obrigatórios.</div>
+                <label for="fInsta">Instagram da empresa</label>
+                <input type="text" id="fInsta" placeholder="@suaempresa">
+              </div>
+              <div class="field">
+                <label for="fEmail">E-mail para contato</label>
+                <input type="email" id="fEmail" placeholder="seuemail@empresa.com">
+                <div class="field-hint">Preencha Instagram ou e-mail (pelo menos um dos dois).</div>
               </div>
               <button type="submit" class="btn-submit" id="btnDiag">Iniciar diagnóstico →</button>
-              <div class="form-msg" id="formMsg" role="status" aria-live="polite"></div>
+              <div class="form-msg" id="formMsg"></div>
+              <p class="micro">Ao iniciar, seus dados são registrados pela equipe ELOGA e você será direcionado ao formulário completo de diagnóstico.</p>
             </form>
           </div>
         </div>
@@ -552,40 +549,62 @@
     window.open(link, '_blank');
   }
 
-  // Envio nativo: o serviço recebe os campos e redireciona para _next.
-  // Antes de divulgar, publique no GitHub Pages, ative o formulário pelo
-  // e-mail da ELOGA e confirme recebimento + redirecionamento com um teste.
+  // ---- Formulário de diagnóstico: envio por e-mail via FormSubmit.co ----
+  // FormSubmit.co não exige criação de conta: na primeira vez que alguém enviar
+  // este formulário, a Helle recebe um e-mail de confirmação em eloga.contato@gmail.com
+  // pedindo para clicar em "Activate Form". A partir daí, todo envio chega direto
+  // por e-mail, automaticamente, sem o visitante ver nada além da mensagem de sucesso.
+  const FORM_ENDPOINT = 'https://formsubmit.co/ajax/eloga.contato@gmail.com';
+
   const form = document.getElementById('diagForm');
   const msg = document.getElementById('formMsg');
   const btnDiag = document.getElementById('btnDiag');
-  let sending = false;
+  const DIAG_URL = 'https://helle-machado.github.io/formulario-eloga/';
 
   form.addEventListener('submit', function(e){
-    if(sending){ e.preventDefault(); return; }
+    e.preventDefault();
+    const nome = document.getElementById('fNome').value.trim();
+    const empresa = document.getElementById('fEmpresa').value.trim();
+    const insta = document.getElementById('fInsta').value.trim();
+    const email = document.getElementById('fEmail').value.trim();
+
     msg.className = 'form-msg';
-    msg.textContent = '';
-    ['fNome','fInsta','fEmail'].forEach(id => {
-      const field = document.getElementById(id);
-      field.value = field.value.trim();
-    });
-    if(!form.reportValidity()){ e.preventDefault(); return; }
-    if(!['http:', 'https:'].includes(window.location.protocol)){
-      e.preventDefault();
-      msg.textContent = 'Para iniciar, abra o site pelo link publicado no GitHub Pages. O envio não está disponível nesta cópia baixada.';
+    if(!nome || !empresa){
+      msg.textContent = 'Por favor, preencha nome e empresa.';
       msg.classList.add('show','err');
       return;
     }
-    document.getElementById('dataEnvio').value = new Date().toISOString();
-    document.getElementById('origemEnvio').value = window.location.origin + window.location.pathname;
-    sending = true;
+    if(!insta && !email){
+      msg.textContent = 'Informe pelo menos o Instagram ou o e-mail da empresa.';
+      msg.classList.add('show','err');
+      return;
+    }
+
     btnDiag.disabled = true;
-    btnDiag.textContent = 'Iniciando diagnóstico...';
-    // Não cancela o evento: o navegador realiza o POST completo.
-  });
-  window.addEventListener('pageshow', function(){
-    sending = false;
-    btnDiag.disabled = false;
-    btnDiag.textContent = 'Iniciar diagnóstico →';
+    btnDiag.textContent = 'Enviando...';
+
+    const payload = {
+      _subject: 'Nova solicitação de diagnóstico — site ELOGA',
+      Nome: nome,
+      Empresa: empresa,
+      Instagram: insta || '-',
+      'E-mail': email || '-'
+    };
+
+    // Envio do e-mail é "fire-and-forget": nunca bloqueia nem atrasa o acesso à ficha,
+    // mesmo se o FormSubmit estiver pendente de confirmação, lento ou indisponível.
+    try {
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: {'Accept':'application/json','Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      }).catch(function(){ /* falha silenciosa: não afeta o visitante */ });
+    } catch (err) { /* mesmo um erro síncrono aqui não pode travar o fluxo */ }
+
+    // O redirecionamento roda em um temporizador independente do envio do e-mail acima.
+    msg.textContent = 'Recebido! Você será direcionado ao diagnóstico agora.';
+    msg.classList.add('show','ok');
+    setTimeout(function(){ window.location.href = DIAG_URL; }, 1200);
   });
 </script>
 </body>
