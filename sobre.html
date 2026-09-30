@@ -438,6 +438,15 @@ p{margin:0}
 .hero{padding-block:96px 88px}
 .hero-single>*{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
 .hero-single>*:nth-child(2){animation-delay:.1s}.hero-single>*:nth-child(3){animation-delay:.2s}.hero-single>*:nth-child(4){animation-delay:.3s}
+/* contatos clicáveis por inteiro (ícone e texto) */
+.contact-list li{display:block}
+.contact-list a.cl{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:center;text-decoration:none;color:inherit;border-radius:14px;padding:8px;margin:-8px;transition:background .15s}
+.contact-list a.cl:hover{background:var(--tint)}
+.contact-list a.cl:hover .ci{background:var(--purple);color:#fff}
+.contact-list .val{display:block;color:var(--navy);font-weight:700;word-break:break-word}
+.footer-contact li.rl{display:block}
+.footer-contact a.fc{display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:center;color:#E8EFF2;text-decoration:none}
+.footer-contact a.fc:hover,.footer-contact a.fc:hover svg{color:var(--lime)}
 
 </style>
 </head>
@@ -501,10 +510,10 @@ p{margin:0}
       <h3>Contato</h3>
       <ul class="footer-contact">
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>São Paulo, SP · Atendimento em todo o Brasil</span></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h3l2 5-2.5 1.5a11 11 0 0 0 7 7L16 14l5 2v3a2 2 0 0 1-2 2A17 17 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg><a href="https://wa.me/5511945027978" target="_blank" rel="noopener">(11) 9 4502-7978 · WhatsApp</a></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><a href="mailto:eloga.contato@gmail.com">eloga.contato@gmail.com</a></li>
+        <li class="rl"><a class="fc" href="https://wa.me/5511945027978" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h3l2 5-2.5 1.5a11 11 0 0 0 7 7L16 14l5 2v3a2 2 0 0 1-2 2A17 17 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg><span>(11) 9 4502-7978 · WhatsApp</span></a></li>
+        <li class="rl"><a class="fc" href="mailto:eloga.contato@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>eloga.contato@gmail.com</span></a></li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Segunda a sexta, das 9h às 18h</span></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><a href="privacidade.html">Política de Privacidade</a></li>
+        <li class="rl"><a class="fc" href="privacidade.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>Política de Privacidade</span></a></li>
       </ul>
     </div>
   </div>
